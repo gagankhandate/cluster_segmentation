@@ -36,7 +36,7 @@ public:
     pcl_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/obj_recognition/point_cloud", 1);
 
     buffer_.reset(new sensor_msgs::PointCloud2);
-    buffer_->header.frame_id = "map";
+    buffer_->header.frame_id = "base_link";
   }
 
 private:
@@ -48,8 +48,8 @@ private:
 
   void pclCallback(const sensor_msgs::PointCloud2ConstPtr& pcl_msg)
   {
-    listener_.waitForTransform("/map", "/head_camera_depth_optical_frame", ros::Time::now(), ros::Duration(10.0));
-    pcl_ros::transformPointCloud("/map", *pcl_msg, *buffer_, listener_);
+    listener_.waitForTransform("/base_link", "/head_camera_depth_optical_frame", ros::Time::now(), ros::Duration(10.0));
+    pcl_ros::transformPointCloud("/base_link", *pcl_msg, *buffer_, listener_);
     pcl_pub_.publish(buffer_);
   }
 };  // End of class CloudTransformer
@@ -63,6 +63,7 @@ int main(int argc, char **argv)
 
   // Spin until ROS is shutdown
   while (ros::ok())
+  	//ros::Duration(1).sleep();
     ros::spin();
 
   return 0;

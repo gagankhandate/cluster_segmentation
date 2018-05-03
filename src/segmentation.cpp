@@ -87,8 +87,8 @@ void segmentation::cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     //perform passthrough filtering to remove table leg
 
     // create a pcl object to hold the passthrough filtered results
-    pcl::PointCloud<pcl::PointXYZRGB> *xyz_cloud_filtered = new pcl::PointCloud<pcl::PointXYZRGB>;
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr xyzCloudPtrFiltered (xyz_cloud_filtered);
+    pcl::PointCloud<pcl::PointXYZRGB> *xyz_cloud_filtered_z = new pcl::PointCloud<pcl::PointXYZRGB>;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr xyzCloudPtrFiltered_z (xyz_cloud_filtered_z);
 
     // Create the filtering object
     pcl::PassThrough<pcl::PointXYZRGB> pass;
@@ -96,9 +96,25 @@ void segmentation::cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     pass.setFilterFieldName ("z");
     pass.setFilterLimits (.5, 1.1);
     //pass.setFilterLimitsNegative (true);
+    pass.filter (*xyzCloudPtrFiltered_z);
+
+    pcl::PointCloud<pcl::PointXYZRGB> *xyz_cloud_filtered_x = new pcl::PointCloud<pcl::PointXYZRGB>;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr xyzCloudPtrFiltered_x (xyz_cloud_filtered_x);
+
+    pass.setInputCloud (xyzCloudPtrFiltered_z);
+    pass.setFilterFieldName ("x");
+    pass.setFilterLimits (.40, 1.20);
+    //pass.setFilterLimitsNegative (true);
+    pass.filter (*xyzCloudPtrFiltered_x);
+
+    pcl::PointCloud<pcl::PointXYZRGB> *xyz_cloud_filtered_y = new pcl::PointCloud<pcl::PointXYZRGB>;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr xyzCloudPtrFiltered (xyz_cloud_filtered_y);
+
+    pass.setInputCloud (xyzCloudPtrFiltered_x);
+    pass.setFilterFieldName ("y");
+    pass.setFilterLimits (-0.35, 0.35);
+    //pass.setFilterLimitsNegative (true);
     pass.filter (*xyzCloudPtrFiltered);
-
-
 
     // create a pcl object to hold the ransac filtered results
     pcl::PointCloud<pcl::PointXYZRGB> *xyz_cloud_ransac_filtered = new pcl::PointCloud<pcl::PointXYZRGB>;
@@ -199,7 +215,7 @@ void segmentation::cloud_cb (const sensor_msgs::PointCloud2ConstPtr& cloud_msg)
     }
 
     pcl::toPCLPointCloud2(concatenatedClusters, outputPCL);
-    outputPCL.header.frame_id = "map";
+    outputPCL.header.frame_id = "base_link";
     pcl_pub_.publish(outputPCL);
 
     // publish the clusters

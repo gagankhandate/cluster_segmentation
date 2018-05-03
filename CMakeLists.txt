@@ -79,7 +79,7 @@ catkin_python_setup()
  generate_messages(
    DEPENDENCIES
    std_msgs
-	 sensor_msgs
+	sensor_msgs
  )
 
 ################################################
@@ -127,6 +127,7 @@ CATKIN_DEPENDS message_runtime
 ## Your package locations should be listed before other locations
 include_directories(include)
 include_directories(
+  #${OpenCV_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -146,6 +147,7 @@ include_directories(
 add_executable(${PROJECT_NAME}_cloud_transformer src/cloud_transformer.cpp)
 add_executable(${PROJECT_NAME}_segmentation src/segmentation.cpp)
 add_executable(${PROJECT_NAME}_feature_extractor src/feature_extractor.cpp)
+#add_executable(${PROJECT_NAME}_surface_matching src/surface_matching.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -160,12 +162,11 @@ add_dependencies(${PROJECT_NAME}_segmentation ${${PROJECT_NAME}_EXPORTED_TARGETS
 add_dependencies(${PROJECT_NAME}_feature_extractor ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_cloud_transformer
-  ${catkin_LIBRARIES}
-
-)
+target_link_libraries(${PROJECT_NAME}_cloud_transformer ${catkin_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}_segmentation ${catkin_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}_feature_extractor ${catkin_LIBRARIES})
+#target_link_libraries(${PROJECT_NAME}_surface_matching ${catkin_LIBRARIES})
+
 #############
 ## Install ##
 #############
